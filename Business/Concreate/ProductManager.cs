@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Business.Abstract;
+using Business.Constants;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concreate;
@@ -21,10 +22,10 @@ namespace Business.Concreate
         {
             if (product.ProductName.Length < 2)
             {
-                return new ErrorResult("the product name must be at least 2 characters.");
+                return new ErrorResult(Messages.ProductNameInvalid);
             }
             _productDal.Add(product);
-            return new Result(true,"Added a product");
+            return new SuccessResult(Messages.ProductAdded);
         }
 
         public List<Product> GetAll()
