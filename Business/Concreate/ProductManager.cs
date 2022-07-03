@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using Business.Abstract;
 using Business.Constants;
+using Business.ValidationRules.FluentValidation;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concreate;
 using Entities.DTOs;
+using FluentValidation;
 
 namespace Business.Concreate
 {
@@ -20,10 +22,18 @@ namespace Business.Concreate
 
         public IResult Add(Product product)
         {
-            if (product.ProductName.Length < 2)
+            //if (product.ProductName.Length < 2)
+            //{
+            //    return new ErrorResult(Messages.ProductNameInvalid);
+            //}you should validation
+
+            var contex = new ValidationContext<Product>(product);
+            ProductValidator productValidator = new ProductValidator();
+            var result = productValidator.Validate(contex);
+            if (!result.IsValid)
             {
-                return new ErrorResult(Messages.ProductNameInvalid);
-            }
+                throw new ValidationException(result.Errors);            }
+
             _productDal.Add(product);
             return new SuccessResult(Messages.ProductAdded);
         }
