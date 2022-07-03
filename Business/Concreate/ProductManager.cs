@@ -28,9 +28,9 @@ namespace Business.Concreate
             return new SuccessResult(Messages.ProductAdded);
         }
 
-        public List<Product> GetAll()
+        public IDataResult<List<Product>> GetAll()
         {
-            return _productDal.GetAll();
+            return new DataResult<List<Product>>(_productDal.GetAll(),true,"listed products");
         }
 
         public List<Product> GetAllByCategoryId(int id)
