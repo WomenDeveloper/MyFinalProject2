@@ -17,14 +17,22 @@ using Entities.DTOs;
 static void ProductTest()
 {
     ProductManager productManager = new ProductManager(new EfProductDal());
-    foreach (Product p in productManager.GetByUnitPrice(2, 500))
+    foreach (Product p in productManager.GetByUnitPrice(2, 500).Data)
     {
         Console.WriteLine(p.ProductName);
     }
 }
 
 ProductManager productManager = new ProductManager(new EfProductDal());
-foreach (ProductDetailDto p in productManager.GetProductDetails())
+var result = productManager.GetProductDetails();
+if (result.Success == true)
 {
-    Console.WriteLine(p.ProductName+" / "+ p.CategoryName);
+    foreach (ProductDetailDto p in result.Data )
+    {
+        Console.WriteLine(p.ProductName + " / " + p.CategoryName);
+    }
+}
+else
+{
+    Console.WriteLine(result.Message);
 }
