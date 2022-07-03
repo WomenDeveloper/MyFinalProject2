@@ -24,8 +24,8 @@ namespace WebAPI.Controllers
             _productService = productService;
         }
 
-        [HttpGet]
-        public IEnumerable<Product> Get()
+        [HttpGet("getall")]
+        public IActionResult Get()
         {
             //return new List<Product>
             //{
@@ -35,11 +35,40 @@ namespace WebAPI.Controllers
             //    new Product{ProductId=4,CategoryId=1, ProductName="Pencil",UnitPrice=10,UnitsInStock=200},
             //    new Product{ProductId=5,CategoryId=1, ProductName="Book",UnitPrice=15,UnitsInStock=400},
             //};
-            
+
             var result = _productService.GetAll();
-            return result.Data;
+            if (result.Success)
+            {
+                return Ok(result.Data);
+            }
+            else
+            {
+                return BadRequest(result.Message);
+            }
 
         }
+
+        [HttpGet("getbyid") ]
+        public IActionResult Get(int id)
+        {
+            var result = _productService.GetById(id);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else { return BadRequest(result); }
+        }
+
+
+        [HttpPost]
+        public IActionResult Post(Product product)
+        {
+            var result = _productService.Add(product);
+            if (result.Success) { return Ok(result); }
+            else { return BadRequest(result); }
+        }
+
+
 
     }
 }
