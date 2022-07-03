@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Business.Abstract;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Validation;
 using Core.CrossCuttingConcerns.Validation;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
@@ -21,6 +22,7 @@ namespace Business.Concreate
             _productDal = productDal;
         }
 
+        [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)
         {
             //if (product.ProductName.Length < 2)
@@ -35,7 +37,7 @@ namespace Business.Concreate
             //{
             //    throw new ValidationException(result.Errors); }
 
-            ValidationTool.Validate(new ProductValidator(),product);
+            //ValidationTool.Validate(new ProductValidator(),product); -> move to core layer in aspects/autofac/validationaspect
 
             _productDal.Add(product);
             return new SuccessResult(Messages.ProductAdded);
