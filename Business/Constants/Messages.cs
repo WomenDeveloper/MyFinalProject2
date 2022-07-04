@@ -9,6 +9,7 @@ namespace Business.Constants
         public static string MaintenanceTime = "System is under Maintenance";
         public static string ProductCountOfCategoryError = "maximum number of product in category is 15";
         public static string ProductNameAlreadyExits = "Product name already exits";
+        internal static string CategoryLimitexceed ="Category Limit exceed";
     }
 }
 

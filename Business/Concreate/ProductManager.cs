@@ -5,6 +5,7 @@ using Business.Constants;
 using Business.ValidationRules.FluentValidation;
 using Core.Aspects.Autofac.Validation;
 using Core.CrossCuttingConcerns.Validation;
+using Core.Utilities.Business;
 using Core.Utilities.Results;
 using DataAccess.Abstract;
 using Entities.Concreate;
@@ -16,10 +17,12 @@ namespace Business.Concreate
     public class ProductManager : IProductService
     {
         IProductDal _productDal;
+        ICategoryService _categoryService;
 
-        public ProductManager(IProductDal productDal)
+        public ProductManager(IProductDal productDal, ICategoryService categoryService)
         {
             _productDal = productDal;
+            _categoryService = categoryService;
         }
 
         [ValidationAspect(typeof(ProductValidator))]
@@ -39,15 +42,21 @@ namespace Business.Concreate
 
             //ValidationTool.Validate(new ProductValidator(),product); -> move to core layer in aspects/autofac/validationaspect
 
-            if (CheckIfProductCountOfCategoryCorrect(product.CategoryId).Success)
-            {
-                if (CheckIfProductNameExits(product.ProductName).Success)
-                {
-                    _productDal.Add(product);
-                    return new SuccessResult(Messages.ProductAdded);
-                }
-            }
-            return new ErrorResult();
+            //if (CheckIfProductCountOfCategoryCorrect(product.CategoryId).Success)
+            //{
+            //    if (CheckIfProductNameExits(product.ProductName).Success)
+            //    {
+            //        _productDal.Add(product);
+            //        return new SuccessResult(Messages.ProductAdded);
+            //    }
+            //}
+            IResult result =BusinessRules.Run(CheckIfProductNameExits(product.ProductName),
+                CheckIfProductCountOfCategoryCorrect(product.CategoryId),
+                CheckIfCategoryLimitExceed());
+            if (result != null) return result;
+
+            _productDal.Add(product);
+            return new SuccessResult(Messages.ProductAdded);
         }
 
         public IDataResult<List<Product>> GetAll()
@@ -94,6 +103,15 @@ namespace Business.Concreate
             if (result)
             {
                 return new ErrorResult(Messages.ProductNameAlreadyExits);
+            }
+            return new SuccessResult();
+        }
+        private IResult CheckIfCategoryLimitExceed()
+        {
+            var result = _categoryService.GetAll();
+            if (result.Data.Count > 30)
+            {
+                return new ErrorResult(Messages.CategoryLimitexceed);
             }
             return new SuccessResult();
         }
