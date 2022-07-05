@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Business.Abstract;
+using Business.BusinessAspects.Autofac;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
 using Core.Aspects.Autofac.Validation;
@@ -24,7 +25,7 @@ namespace Business.Concreate
             _productDal = productDal;
             _categoryService = categoryService;
         }
-
+        [SecuredOperation("product.add,admin")]
         [ValidationAspect(typeof(ProductValidator))]
         public IResult Add(Product product)
         {
@@ -99,8 +100,8 @@ namespace Business.Concreate
         }
         private IResult CheckIfProductNameExits(string productName)
         {
-            var result = _productDal.GetAll(p => p.ProductName == productName).Any();
-            if (result)
+            var result = _productDal.GetAll(p => p.ProductName == productName);
+            if (result != null)
             {
                 return new ErrorResult(Messages.ProductNameAlreadyExits);
             }
